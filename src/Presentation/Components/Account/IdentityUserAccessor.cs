@@ -1,5 +1,5 @@
+using Infrastructure.Entities;
 using Microsoft.AspNetCore.Identity;
-using Presentation.Data;
 
 namespace Presentation.Components.Account;
 

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text.Json;
+using Infrastructure.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -8,9 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Presentation.Components.Account.Pages;
 using Presentation.Components.Account.Pages.Manage;
-using Presentation.Data;
 
-namespace Microsoft.AspNetCore.Routing;
+namespace Presentation.Components.Account;
 
 internal static class IdentityComponentsEndpointRouteBuilderExtensions
 {

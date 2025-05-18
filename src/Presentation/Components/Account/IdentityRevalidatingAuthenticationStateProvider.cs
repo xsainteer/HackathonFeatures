@@ -1,10 +1,9 @@
 using System.Security.Claims;
+using Infrastructure.Entities;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Presentation.Data;
-
 namespace Presentation.Components.Account;
 
 // This is a server-side AuthenticationStateProvider that revalidates the security stamp for the connected user

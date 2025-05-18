@@ -1,9 +1,11 @@
+using Infrastructure.Database;
+using Infrastructure.Email;
+using Infrastructure.Entities;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Components;
 using Presentation.Components.Account;
-using Presentation.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,12 +31,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = 
+        builder.Configuration.GetValue("SignIn.RequireConfirmedAccount", false))
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+builder.Services.AddSingleton<IEmailSender<ApplicationUser>, SmtpEmailSender>();
 
 var app = builder.Build();
 
