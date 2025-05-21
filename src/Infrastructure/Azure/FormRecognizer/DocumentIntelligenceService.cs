@@ -1,29 +1,22 @@
 using Application.Interfaces;
 using Azure;
 using Azure.AI.DocumentIntelligence;
-using Azure.AI.FormRecognizer.DocumentAnalysis;
 
 namespace Infrastructure.Azure.FormRecognizer;
 
 public class DocumentIntelligenceService : IDocumentIntelligenceService
 {
     private readonly DocumentIntelligenceClient _client;
-    private readonly DocumentAnalysisClient _analysisClient;
-    
 
-    public DocumentIntelligenceService(DocumentIntelligenceClient client, DocumentAnalysisClient analysisClient)
+    public DocumentIntelligenceService(DocumentIntelligenceClient client)
     {
         _client = client;
-        _analysisClient = analysisClient;
     }
-
-    public async Task<object?> GetObjectFromFormRecognizer(Stream stream)
+    
+    public async Task<object?> GetObjectFromFormRecognizer(BinaryData data)
     {
-        var operation = await _analysisClient.AnalyzeDocumentAsync(WaitUntil.Completed, "prebuilt-document", stream);
+        var operation = await _client.AnalyzeDocumentAsync(WaitUntil.Completed, "prebuilt-document", data);
         
-        var result = operation.Value;
-        
-        //TODO - Add logic to process the result and return the desired object
-        return result;
+        return operation.Value.Tables;
     }
 }

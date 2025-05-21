@@ -1,7 +1,6 @@
 using Application.Interfaces;
 using Azure;
 using Azure.AI.DocumentIntelligence;
-using Azure.AI.FormRecognizer.DocumentAnalysis;
 using Infrastructure.Azure.FormRecognizer;
 using Infrastructure.Email;
 using Infrastructure.Entities;
@@ -46,13 +45,6 @@ public static class DependencyInjection
             var settings = sp.GetRequiredService<IOptions<DocumentIntelligenceSettings>>().Value;
             return new DocumentIntelligenceClient(new Uri(settings.Endpoint), new AzureKeyCredential(settings.ApiKey));
         });
-        
-        services.AddSingleton<DocumentAnalysisClient>(sp =>
-        {
-            var settings = sp.GetRequiredService<IOptions<DocumentIntelligenceSettings>>().Value;
-            return new DocumentAnalysisClient(new Uri(settings.Endpoint), new AzureKeyCredential(settings.ApiKey));
-        });
-        
         return services;
     }
 }

@@ -2,5 +2,5 @@ namespace Application.Interfaces;
 
 public interface IDocumentIntelligenceService
 {
-    public Task<object?> GetObjectFromFormRecognizer(Stream stream);
+    public Task<object?> GetObjectFromFormRecognizer(BinaryData data);
 }
