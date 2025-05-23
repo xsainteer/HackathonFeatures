@@ -13,7 +13,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
         _client = client;
     }
     
-    public async Task<object?> GetObjectFromFormRecognizer(BinaryData data)
+    public async Task<IReadOnlyList<DocumentTable>> GetObjectFromFormRecognizer(BinaryData data)
     {
         var operation = await _client.AnalyzeDocumentAsync(WaitUntil.Completed, "prebuilt-document", data);
         

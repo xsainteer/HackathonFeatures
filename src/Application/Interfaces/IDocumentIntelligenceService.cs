@@ -1,6 +1,9 @@
+using Azure.AI.DocumentIntelligence;
+
 namespace Application.Interfaces;
 
 public interface IDocumentIntelligenceService
 {
-    public Task<object?> GetObjectFromFormRecognizer(BinaryData data);
+    // not very clean, but it's just a MVP
+    public Task<IReadOnlyList<DocumentTable>> GetObjectFromFormRecognizer(BinaryData data);
 }
