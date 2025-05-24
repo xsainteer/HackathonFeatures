@@ -1,6 +1,8 @@
 using Application.Interfaces;
 using Azure;
 using Azure.AI.DocumentIntelligence;
+using Azure.AI.Vision.Face;
+using Infrastructure.Azure.FaceRecognizer;
 using Infrastructure.Azure.FormRecognizer;
 using Infrastructure.Database.Entities;
 using Infrastructure.Email;
@@ -30,7 +32,7 @@ public static class DependencyInjection
         services.AddScoped<IEmailSender<ApplicationUser>, SmtpEmailSender>();
         
         // Azure
-        
+        //Document Intelligence
         services.AddOptions<DocumentIntelligenceSettings>()
             .BindConfiguration("Azure")
             .ValidateDataAnnotations()
@@ -48,6 +50,30 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IFraudDetectionService, FraudDetectionService>();
+        
+        //Face Recognizer
+        services.AddOptions<FaceRecognizerSettings>()
+            .BindConfiguration("FaceRecognizer")
+            .ValidateDataAnnotations()
+            .Validate(
+                settings => !string.IsNullOrWhiteSpace(settings.ApiKey)
+                            && !string.IsNullOrWhiteSpace(settings.Endpoint), 
+                "Specify FaceRecognizer settings in dotnet user-secrets");
+
+        services.AddSingleton<FaceClient>(sp =>
+        {
+            var settings = sp.GetRequiredService<IOptions<FaceRecognizerSettings>>().Value;
+            return new FaceClient(new Uri(settings.Endpoint), new AzureKeyCredential(settings.ApiKey));
+        });
+        
+        //Blob storage
+        services.AddOptions<FaceRecognizerSettings>()
+            .BindConfiguration("BlobStorage")
+            .ValidateDataAnnotations()
+            .Validate(
+                settings => !string.IsNullOrWhiteSpace(settings.ApiKey)
+                            && !string.IsNullOrWhiteSpace(settings.Endpoint), 
+                "Specify BlobStorage settings in dotnet user-secrets");
         
         return services;
     }

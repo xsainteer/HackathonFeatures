@@ -1,3 +1,5 @@
+using Application;
+using Infrastructure;
 using Infrastructure.Database;
 using Infrastructure.Database.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -15,6 +17,9 @@ builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 
 builder.Services.AddAuthentication();
+
+builder.Services.AddInfrastructure();
+builder.Services.AddApplication();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

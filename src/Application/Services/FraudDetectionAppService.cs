@@ -27,11 +27,14 @@ public class FraudDetectionAppService : IFraudDetectionAppService
         {
             var prediction = _fraudDetectionService.Predict(input);
             
-            return new PredictionDto
+            var dto = new PredictionDto
             {
                 Probability = prediction.Probability,
-                IsFraud = prediction.Prediction
+                IsFraud = prediction.Prediction,
+                ShowTransactionToOperator = (prediction.Prediction && prediction.Probability > 0.85)
             };
+            
+            return dto;
         }
         catch (Exception e)
         {

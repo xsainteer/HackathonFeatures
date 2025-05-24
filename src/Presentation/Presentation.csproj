@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>aspnet-Presentation-4519d112-2830-4911-814e-bfa78c13a491</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,8 +21,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Application\Application.csproj" />
-      <ProjectReference Include="..\src\Infrastructure\Infrastructure.csproj" />
+      <ProjectReference Include="..\Application\Application.csproj" />
+      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
