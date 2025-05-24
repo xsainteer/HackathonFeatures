@@ -1,4 +1,5 @@
     using System.Text;
+    using Application.DTOs;
     using Application.Interfaces;
     using Azure.AI.DocumentIntelligence;
     using Domain.Enums;
@@ -10,7 +11,7 @@
     
     public interface IDocumentConverterService
     {
-        Task<byte[]> ExportTables(IFormFile file, ExportFormat format);
+        Task<ConvertedDocumentDto> ConvertDocumentAsync(IFormFile file, ExportFormat format);
     }
     
     public class DocumentConverterService : IDocumentConverterService
@@ -26,7 +27,7 @@
         
         // not fully async, maybe rewrite it using different libraries
         // and uses IFormFile, web dependency
-        public async Task<byte[]> ExportTables(IFormFile file, ExportFormat format)
+        public async Task<ConvertedDocumentDto> ConvertDocumentAsync(IFormFile file, ExportFormat format)
         {
             try
             {
@@ -35,13 +36,38 @@
                 
                 var tables = await _documentIntelligenceService.GetObjectFromFormRecognizer(binaryData);
                 
-                return format switch
+                var result = format switch
                 {
                     ExportFormat.Csv => Encoding.UTF8.GetBytes(ConvertTablesToCsv(tables)),
                     ExportFormat.Excel => ConvertTablesToExcel(tables),
                     ExportFormat.Pdf => ConvertTablesToPdf(tables),
                     _ => throw new ArgumentOutOfRangeException(nameof(format), "Unsupported export format"),
                 };
+                
+                var contentType = format switch
+                {
+                    ExportFormat.Csv => "text/csv",
+                    ExportFormat.Excel => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    ExportFormat.Pdf => "application/pdf",
+                    _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+                };
+                
+                var fileExtension = format switch
+                {
+                    ExportFormat.Csv => "csv",
+                    ExportFormat.Excel => "xlsx",
+                    ExportFormat.Pdf => "pdf",
+                    _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+                };
+
+                var convertedDocument = new ConvertedDocumentDto
+                {
+                    Content = result,
+                    ContentType = contentType,
+                    ContentExtension = fileExtension,
+                };
+                
+                return convertedDocument;
             }
             catch (Exception e)
             {

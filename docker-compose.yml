@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    container_name: hackathon-features
+    restart: always
+    environment:
+      POSTGRES_USER: xsainteer
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: hackathon-features
+    ports:
+      - "5432:5432"

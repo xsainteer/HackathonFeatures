@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.Mail;
-using Infrastructure.Entities;
+using Infrastructure.Database.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

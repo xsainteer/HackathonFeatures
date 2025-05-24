@@ -2,8 +2,9 @@ using Application.Interfaces;
 using Azure;
 using Azure.AI.DocumentIntelligence;
 using Infrastructure.Azure.FormRecognizer;
+using Infrastructure.Database.Entities;
 using Infrastructure.Email;
-using Infrastructure.Entities;
+using Infrastructure.FraudDetection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -45,6 +46,9 @@ public static class DependencyInjection
             var settings = sp.GetRequiredService<IOptions<DocumentIntelligenceSettings>>().Value;
             return new DocumentIntelligenceClient(new Uri(settings.Endpoint), new AzureKeyCredential(settings.ApiKey));
         });
+
+        services.AddScoped<IFraudDetectionService, FraudDetectionService>();
+        
         return services;
     }
 }
