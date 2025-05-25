@@ -21,4 +21,5 @@ These features were made during this hackathon - https://www.knu.kg/ky/ru/archiv
 
 ## P.S.
 
-It's just a MVP, made to show ideas and how one can implement them
+It's just a MVP, made to show ideas and how one can implement them 
+(I tried to use Clean Architecture pattern but after second hour i realized it would take days to code it, thus some pieces of code might violate Clean Architecture)
