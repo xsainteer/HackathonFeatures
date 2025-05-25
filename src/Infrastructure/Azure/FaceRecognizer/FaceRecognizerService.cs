@@ -26,7 +26,7 @@ public class FaceRecognizerService : IFaceRecognizerService
         _blobStorageSettings = blobStorageSettings.Value;
     }
 
-    public async Task<List<Guid>> IdentifyFaces(BinaryData photoData)
+    public async Task<List<Guid>> IdentifyFacesAsync(BinaryData photoData)
     {
         await CreatePersonGroupIfNotExistsAsync();
         var detectedFaces = await DetectFacesAsync(photoData);
@@ -108,8 +108,6 @@ public class FaceRecognizerService : IFaceRecognizerService
         var detectResponse = await _faceClient.DetectAsync(photoData, FaceDetectionModel.Detection03, _faceRecognitionModel, false, [FaceAttributeType.QualityForRecognition]);
         
         var facesInImage = detectResponse.Value;
-
-        bool sufficientQuality = true;
         
         foreach (FaceDetectionResult face in facesInImage)
         {
@@ -118,21 +116,12 @@ public class FaceRecognizerService : IFaceRecognizerService
             //  Only "high" quality images are recommended for person enrollment
             if (faceQualityForRecognition.HasValue && (faceQualityForRecognition.Value == QualityForRecognition.High))
             {
-                sufficientQuality = false;
-                break;
+                await _largePersonGroupClient.AddFaceAsync(personId, photoData, detectionModel: FaceDetectionModel.Detection03);
             }
-            
-            if (!sufficientQuality)
+            else
             {
-                continue;
+                Console.WriteLine("quality is too low");
             }
-
-            if (facesInImage.Count != 1)
-            {
-                continue;
-            }
-            
-            await _largePersonGroupClient.AddFaceAsync(personId, photoData, detectionModel: FaceDetectionModel.Detection03);
         }
 
         

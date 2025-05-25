@@ -9,7 +9,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IDocumentConverterService, DocumentConverterService>();
 
-        services.AddScoped<IFraudDetectionAppService, IFraudDetectionAppService>();
+        services.AddScoped<IFraudDetectionAppService, FraudDetectionAppService>();
         
         return services;
     }

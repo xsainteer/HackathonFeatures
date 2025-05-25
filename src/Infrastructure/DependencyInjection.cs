@@ -18,19 +18,19 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        // Email
-        services.AddOptions<SmtpSettings>()
-            .BindConfiguration("Smtp")
-            .ValidateDataAnnotations()
-            .Validate(settings => 
-            {
-                // Validate SMTP settings (Port and Host)
-                if (settings.Port <= 0 || settings.Port > 65535)
-                    return false;
-                return !string.IsNullOrWhiteSpace(settings.Host);
-            }, "specify SMTP settings in dotnet user-secrets");
-        
-        services.AddScoped<IEmailSender<ApplicationUser>, SmtpEmailSender>();
+        // // Email
+        // services.AddOptions<SmtpSettings>()
+        //     .BindConfiguration("Smtp")
+        //     .ValidateDataAnnotations()
+        //     .Validate(settings => 
+        //     {
+        //         // Validate SMTP settings (Port and Host)
+        //         if (settings.Port <= 0 || settings.Port > 65535)
+        //             return false;
+        //         return !string.IsNullOrWhiteSpace(settings.Host);
+        //     }, "specify SMTP settings in dotnet user-secrets");
+        //
+        // services.AddScoped<IEmailSender<ApplicationUser>, SmtpEmailSender>();
         
         // Azure
         //Document Intelligence
@@ -76,14 +76,14 @@ public static class DependencyInjection
 
         services.AddScoped<IFaceRecognizerService, FaceRecognizerService>();
         
-        //Blob storage
-        services.AddOptions<BlobStorageSettings>()
-            .BindConfiguration("BlobStorage")
-            .ValidateDataAnnotations()
-            .Validate(
-                settings => !string.IsNullOrWhiteSpace(settings.ApiKey)
-                            && !string.IsNullOrWhiteSpace(settings.Endpoint), 
-                "Specify BlobStorage settings in dotnet user-secrets");
+        // //Blob storage
+        // services.AddOptions<BlobStorageSettings>()
+        //     .BindConfiguration("BlobStorage")
+        //     .ValidateDataAnnotations()
+        //     .Validate(
+        //         settings => !string.IsNullOrWhiteSpace(settings.ApiKey)
+        //                     && !string.IsNullOrWhiteSpace(settings.Endpoint), 
+        //         "Specify BlobStorage settings in dotnet user-secrets");
         
         return services;
     }

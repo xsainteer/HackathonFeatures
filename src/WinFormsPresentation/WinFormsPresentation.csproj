@@ -6,12 +6,19 @@
         <Nullable>enable</Nullable>
         <UseWindowsForms>true</UseWindowsForms>
         <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>aspnet-Presentation-4519d112-2830-4911-814e-bfa78c13a491</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Emgu.CV" Version="4.10.0.5680" />
       <PackageReference Include="Emgu.CV.runtime.windows" Version="4.10.0.5680" />
       <PackageReference Include="Emgu.CV.UI" Version="4.10.0.5680" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-preview.4.25258.110" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0-preview.4.25258.110" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

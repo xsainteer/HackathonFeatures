@@ -8,15 +8,15 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.WebHost.UseUrls("http://localhost:5000");
 
 builder.Services.AddControllers();
 
 builder.Services.AddAuthorization();
 
 builder.Services.AddAuthentication();
+
+builder.Configuration.AddUserSecrets<Program>();
 
 builder.Services.AddInfrastructure();
 builder.Services.AddApplication();
@@ -38,25 +38,26 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddApiEndpoints();
-    
+
 var app = builder.Build();
 
 app.UseRouting();
 
 app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
+    options.RoutePrefix = "swagger";
+});
+
+
 app.MapControllers();
 
 app.MapIdentityApi<ApplicationUser>();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
-        options.RoutePrefix = string.Empty;
-    });
-}
 
 app.Run();

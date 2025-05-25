@@ -2,6 +2,7 @@ using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System.Drawing.Imaging;
+using Application.Interfaces;
 using Timer = System.Windows.Forms.Timer;
 
 namespace WinFormsPresentation
@@ -13,15 +14,11 @@ namespace WinFormsPresentation
         private Timer timer;
         private CascadeClassifier faceDetector;
 
-        private HttpClient httpClient;
-        private const string AzureFaceApiKey = "YOUR_AZURE_FACE_API_KEY";
-        private const string AzureFaceApiEndpoint = "https://YOUR_REGION.api.cognitive.microsoft.com/face/v1.0/detect?returnFaceId=true";
+        private readonly IFaceRecognizerService _faceRecognizerService;
 
-        private bool _faceAlreadySent = false;
-        private DateTime _lastFaceDetectedTime;
-
-        public MainForm()
+        public MainForm(IFaceRecognizerService faceRecognizerService)
         {
+            _faceRecognizerService = faceRecognizerService;
             Width = 800;
             Height = 600;
             Text = "EmguCV Camera with Face Detection";
@@ -39,14 +36,14 @@ namespace WinFormsPresentation
 
             faceDetector = new CascadeClassifier("haarcascade_frontalface_default.xml");
 
-            httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", AzureFaceApiKey);
-
             timer = new Timer { Interval = 30 };
             timer.Tick += Timer_Tick;
             timer.Start();
         }
 
+        private DateTime _lastSendTime = DateTime.MinValue;
+        private readonly TimeSpan _sendInterval = TimeSpan.FromSeconds(2);
+        
         private async void Timer_Tick(object sender, EventArgs e)
         {
             using var frame = capture.QueryFrame();
@@ -59,30 +56,28 @@ namespace WinFormsPresentation
 
             if (faces.Length > 0)
             {
-                _lastFaceDetectedTime = DateTime.Now;
+                var now = DateTime.Now;
 
-                if (!_faceAlreadySent)
+                if (now - _lastSendTime >= _sendInterval)
                 {
-                    var faceRect = faces[0];
+                    _lastSendTime = now; // обновляем время отправки перед запуском задачи
+                    
                     try
                     {
-                        using var faceMat = new Mat(frame, faceRect);
-                        byte[] jpegBytes = MatToJpegBytes(faceMat);
-                        await SendFaceToAzureApiAsync(jpegBytes);
-                        _faceAlreadySent = true;
+                        byte[] jpegBytes = MatToJpegBytes(frame);
+                        var result = BinaryData.FromBytes(jpegBytes);
+
+                        _ = Task.Run(async () =>
+                        {
+                            var ids = await _faceRecognizerService.IdentifyFacesAsync(result);
+                            Console.WriteLine("something after identifying");
+                            // здесь можно обновить UI через Invoke, если нужно
+                        });
                     }
                     catch (Exception ex)
                     {
                         // Логировать ошибку если нужно
                     }
-                }
-            }
-            else
-            {
-                // Если прошло более 1 секунды с момента последнего обнаружения лица — сбрасываем флаг
-                if (_faceAlreadySent && (DateTime.Now - _lastFaceDetectedTime).TotalSeconds > 1)
-                {
-                    _faceAlreadySent = false;
                 }
             }
 
@@ -102,25 +97,12 @@ namespace WinFormsPresentation
             return ms.ToArray();
         }
 
-        private async Task SendFaceToAzureApiAsync(byte[] imageBytes)
-        {
-            using var content = new ByteArrayContent(imageBytes);
-            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
-
-            var response = await httpClient.PostAsync(AzureFaceApiEndpoint, content);
-            var result = await response.Content.ReadAsStringAsync();
-
-            // Здесь можно обработать результат
-            Console.WriteLine(result);
-        }
-
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             base.OnFormClosed(e);
             timer.Stop();
             capture?.Dispose();
             faceDetector?.Dispose();
-            httpClient?.Dispose();
         }
     }
 }
