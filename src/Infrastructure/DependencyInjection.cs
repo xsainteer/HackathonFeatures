@@ -2,6 +2,7 @@ using Application.Interfaces;
 using Azure;
 using Azure.AI.DocumentIntelligence;
 using Azure.AI.Vision.Face;
+using Infrastructure.Azure.BlobStorage;
 using Infrastructure.Azure.FaceRecognizer;
 using Infrastructure.Azure.FormRecognizer;
 using Infrastructure.Database.Entities;
@@ -57,7 +58,8 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .Validate(
                 settings => !string.IsNullOrWhiteSpace(settings.ApiKey)
-                            && !string.IsNullOrWhiteSpace(settings.Endpoint), 
+                            && !string.IsNullOrWhiteSpace(settings.Endpoint)
+                            && !string.IsNullOrWhiteSpace(settings.PersonGroupId), 
                 "Specify FaceRecognizer settings in dotnet user-secrets");
 
         services.AddSingleton<FaceClient>(sp =>
@@ -66,8 +68,16 @@ public static class DependencyInjection
             return new FaceClient(new Uri(settings.Endpoint), new AzureKeyCredential(settings.ApiKey));
         });
         
+        services.AddSingleton<LargePersonGroupClient>(sp =>
+        {
+            var settings = sp.GetRequiredService<IOptions<FaceRecognizerSettings>>().Value;
+            return new FaceAdministrationClient(new Uri(settings.Endpoint), new AzureKeyCredential(settings.ApiKey)).GetLargePersonGroupClient(settings.PersonGroupId);
+        });
+
+        services.AddScoped<IFaceRecognizerService, FaceRecognizerService>();
+        
         //Blob storage
-        services.AddOptions<FaceRecognizerSettings>()
+        services.AddOptions<BlobStorageSettings>()
             .BindConfiguration("BlobStorage")
             .ValidateDataAnnotations()
             .Validate(
